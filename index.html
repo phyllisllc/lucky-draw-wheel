@@ -4,7 +4,358 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>德玛仕百万大抽奖</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            background-color: #f8f8f8;
+            background-image: radial-gradient(#ff6700 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-position: -19px -19px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 页面容器 */
+        .container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* 头部样式 */
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 180rpx;
+            height: 180rpx;
+            margin-bottom: 20rpx;
+            animation: shake 0.5s ease-in-out 1;
+        }
+
+        .title {
+            font-size: 48rpx;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10rpx;
+        }
+
+        .subtitle {
+            font-size: 28rpx;
+            color: #666;
+        }
+
+        /* 抽奖区域样式 */
+        .lottery-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        /* 转盘容器 */
+        .turntable-container {
+            position: relative;
+            width: 70vw;
+            height: 70vw;
+            max-width: 300px;
+            max-height: 300px;
+            margin-bottom: 30px;
+        }
+
+        /* 转盘样式 */
+        .turntable {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Canvas样式 */
+        #turntableCanvas {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        /* 转盘指针容器 */
+        .pointer-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            pointer-events: none;
+        }
+
+        /* 转盘指针 */
+        .pointer {
+            width: 100%;
+            height: 100%;
+            transform: rotate(180deg);
+        }
+
+        /* 抽奖按钮 */
+        .start-btn {
+            width: 240px;
+            height: 50px;
+            line-height: 50px;
+            background: linear-gradient(135deg, #ff6700, #ff9500);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 25px;
+            margin-bottom: 15px;
+            box-shadow: 0 6px 12px rgba(255, 103, 0, 0.4);
+            border: none;
+            outline: none;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .start-btn.disabled {
+            background: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* 测试按钮 */
+        .test-btn {
+            width: 200px;
+            height: 45px;
+            line-height: 45px;
+            background: linear-gradient(135deg, #4ECDC4 0%, #45B7AA 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 22.5px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(78, 205, 196, 0.4);
+            border: none;
+            outline: none;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(78, 205, 196, 0.5);
+        }
+
+        .test-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(78, 205, 196, 0.4);
+        }
+
+        /* 提示信息 */
+        .tips {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* 结果弹窗 */
+        .result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+            touch-action: manipulation;
+        }
+
+        .result-content {
+            width: 90%;
+            max-width: 320px;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: modalAppear 0.3s ease-out;
+        }
+
+        @keyframes modalAppear {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .result-icon {
+            width: 120rpx;
+            height: 120rpx;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30rpx;
+            font-size: 60rpx;
+        }
+
+        .result-icon.success {
+            background: #4cd964;
+            color: white;
+        }
+
+        .result-icon.fail {
+            background: #ff3b30;
+            color: white;
+        }
+
+        .result-title {
+            font-size: 40rpx;
+            font-weight: bold;
+            margin-bottom: 20rpx;
+        }
+
+        .result-message {
+            font-size: 32rpx;
+            color: #666;
+            text-align: center;
+            margin-bottom: 40rpx;
+            line-height: 1.5;
+        }
+
+        .result-btn {
+            width: 300rpx;
+            height: 80rpx;
+            line-height: 80rpx;
+            background: #ff6700;
+            color: white;
+            font-size: 32rpx;
+            border-radius: 40rpx;
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* 规则说明区域 */
+        .rules-section {
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .rules-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .rules-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .rules-content p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* 适配不同尺寸的屏幕 */
+        @media (max-width: 375px) {
+            .turntable-container {
+                width: 75vw;
+                height: 75vw;
+            }
+            canvas {
+                width: 100% !important;
+                height: 100% !important;
+            }
+            .start-btn {
+                width: 220px;
+                height: 48px;
+                line-height: 48px;
+                font-size: 17px;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .turntable-container {
+                width: 80vw;
+                height: 80vw;
+            }
+            canvas {
+                width: 100% !important;
+                height: 100% !important;
+            }
+            .start-btn {
+                width: 190px;
+                height: 45px;
+                line-height: 45px;
+                font-size: 16px;
+            }
+        }
+
+        /* 抽奖流程说明样式 */
+        .process-section {
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .process-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff6700;
+            margin-bottom: 15px;
+        }
+
+        .process-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .process-content p {
+            font-size: 15px;
+            color: #333;
+            line-height: 1.6;
+        }
+    </style>
     <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
 </head>
 <body>
@@ -13,6 +364,18 @@
         <div class="header">
             <h1 class="title">德玛仕百万大抽奖</h1>
             <p class="subtitle">多重好礼等你来赢！</p>
+        </div>
+
+        <!-- 抽奖流程说明 -->
+        <div class="process-section">
+            <h3 class="process-title">抽奖流程</h3>
+            <div class="process-content">
+                <p>1. 成为德玛仕品牌会员，活动期间即可获得1次免费抽奖机会；</p>
+                <p>2. 凡是活动期间购买可获得抽奖机会1次；</p>
+                <p>3. 收藏加购活动商品，活动期间即可获得1次免费抽奖机会；</p>
+                <p>4. 点击"开始抽奖"按钮，转盘旋转并最终停在随机奖项上；</p>
+                <p>5. 中奖结果将实时显示，中奖用户需按提示进行下一步操作。</p>
+            </div>
         </div>
 
         <!-- 抽奖区域 -->
@@ -25,7 +388,10 @@
                 </div>
                 <!-- 转盘指针 -->
                 <div class="pointer-container">
-                    <img class="pointer" src="assets/images/pointer.svg" alt="指针">
+                    <svg class="pointer" width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M30 0L15 60L45 60L30 0Z" fill="#FF6700"/>
+                        <path d="M30 10L25 50L35 50L30 10Z" fill="#FFFFFF"/>
+                    </svg>
                 </div>
             </div>
 
@@ -51,11 +417,8 @@
 
         <!-- 抽奖规则说明 -->
         <div class="rules-section">
-            <h3 class="rules-title">百万大抽奖规则</h3>
+            <h3 class="rules-title">活动规则</h3>
             <div class="rules-content">
-                <p>1、成为德玛仕品牌会员，活动期间即可获得1次免费抽奖机会；</p>
-                <p>2、凡是活动期间购买可获得抽奖机会1次；</p>
-                <p>3、收藏加购活动商品，活动期间即可获得1次免费抽奖机会；</p>
                 <p>抽奖流程：用户完成指定任务后，抽奖机会将自动计入账户。进入活动页面即可点击抽奖，奖品随机抽取，100%有奖。</p>
                 <p>中奖通知：中奖结果将实时显示。中奖实物奖品及大额优惠券的用户，需在24小时内联系客服登记，逾期视为自动放弃。</p>
                 <p>奖品发放：</p>
@@ -63,15 +426,385 @@
                 <p>实物奖品：将在活动结束后10个工作日内统一核实并寄出。</p>
                 <p>资格取消条款：</p>
                 <p>若用户账户存在异常、作弊或违反平台规则的行为，德玛仕有权取消其获奖资格。</p>
+                <p>针对获得的抽奖机会及奖品：</p>
                 <p>若该笔订单在抽奖后发生全额退款或取消，则由此订单获得的抽奖机会及通过这机会抽中的所有奖品（包括优惠券和实物）将自动失效。</p>
                 <p>若订单为部分退款，且订单状态仍为"交易成功"，则抽奖资格及所获奖品予以保留。</p>
                 <p>所有优惠券奖品一经使用，若订单发生退款，该优惠券将作废不予退还。</p>
-                <p>*此抽奖礼品不与店铺其他优惠券、赠品等活动叠加使用。</p>
-                <p>*中奖客户由各自店铺进行发货即可</p>
             </div>
         </div>
     </div>
 
-    <script src="scripts.js"></script>
+    <script>
+        // 全局变量
+        let isRotating = false; // 是否正在旋转
+        let remainingChances = 3; // 剩余抽奖次数
+        const maxChances = 3; // 最大抽奖次数
+
+        // 奖项数据
+        const prizes = [
+            { name: '八等奖：50元优惠券', value: '800元-50元优惠券', color: '#FF6B6B', probability: 5, image: '../assets/images/coupon_50.png' },
+            { name: '七等奖：100元优惠券', value: '1500元-100元优惠券', color: '#CD7F32', probability: 5, image: '../assets/images/coupon_100.png' },
+            { name: '六等奖：200元优惠券', value: '3000元-200元优惠券', color: '#C0C0C0', probability: 5, image: '../assets/images/coupon_200.png' },
+            { name: '五等奖：300元优惠券', value: '5000元-300元优惠券', color: '#FFD700', probability: 5, image: '../assets/images/coupon_300.png' },
+            { name: '四等奖：500元优惠券', value: '10000元-500元优惠券', color: '#4ECDC4', probability: 79, image: '../assets/images/coupon_500.png' },
+            { name: '三等奖：德玛仕电磁炉', value: '德玛仕3500W电磁炉IH-QT-3500H1(价值599元)', color: '#FF9800', probability: 1, image: '../assets/images/induction_cooker.png' },
+            { name: '二等奖：华为平板', value: '华为平板HUWEIMatePad(价值1899元)', color: '#9C27B0', probability: 0, image: '../assets/images/huawei_tablet.png' },
+            { name: '一等奖：华为Mate XT手机', value: '华为Mate XT 非凡大师 三折叠屏手机(价值19999元)', color: '#E91E63', probability: 0, image: '../assets/images/huawei_phone.png' }
+        ];
+
+        // DOM元素
+        const turntable = document.getElementById('turntable');
+        const canvas = document.getElementById('turntableCanvas');
+        const ctx = canvas.getContext('2d');
+        const startBtn = document.getElementById('startBtn');
+        const testBtn = document.getElementById('testBtn');
+        const chancesTip = document.getElementById('chancesTip');
+        const resultModal = document.getElementById('resultModal');
+        const resultIcon = document.getElementById('resultIcon');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultMessage = document.getElementById('resultMessage');
+        const closeBtn = document.getElementById('closeBtn');
+
+        // 页面加载完成后初始化
+        window.onload = function() {
+            init();
+        };
+
+        // 初始化函数
+        function init() {
+            // 从本地存储加载抽奖次数
+            loadChances();
+            
+            // 绘制转盘
+            drawTurntable();
+            
+            // 添加事件监听
+            startBtn.addEventListener('click', startRotate);
+            testBtn.addEventListener('click', testRotate);
+            closeBtn.addEventListener('click', closeResult);
+            
+            // 初始化微信分享
+            initWechatShare();
+        }
+
+        // 从本地存储加载抽奖次数
+        function loadChances() {
+            const today = new Date().toDateString();
+            const savedDate = localStorage.getItem('lotteryDate');
+            const savedChances = localStorage.getItem('lotteryChances');
+            
+            // 如果是同一天，加载保存的次数；否则重置次数
+            if (savedDate === today && savedChances !== null) {
+                remainingChances = parseInt(savedChances);
+            } else {
+                remainingChances = maxChances;
+                saveChances();
+            }
+            
+            // 更新提示信息
+            updateChancesTip();
+        }
+
+        // 保存抽奖次数到本地存储
+        function saveChances() {
+            const today = new Date().toDateString();
+            localStorage.setItem('lotteryDate', today);
+            localStorage.setItem('lotteryChances', remainingChances.toString());
+        }
+
+        // 更新抽奖次数提示
+        function updateChancesTip() {
+            if (remainingChances > 0) {
+                chancesTip.textContent = '剩余抽奖次数：' + remainingChances;
+            } else {
+                chancesTip.textContent = '抽奖次数已用完';
+                startBtn.classList.add('disabled');
+                startBtn.disabled = true;
+            }
+        }
+
+        // 绘制转盘
+        function drawTurntable() {
+            const width = canvas.width / 2; // 转盘半径
+            const centerX = width; // 中心点X坐标
+            const centerY = width; // 中心点Y坐标
+            const angle = 2 * Math.PI / prizes.length; // 每个扇形的角度
+            
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制每个奖项区域
+            for (let i = 0; i < prizes.length; i++) {
+                const prize = prizes[i];
+                const startAngle = i * angle;
+                const endAngle = (i + 1) * angle;
+                
+                // 绘制扇形
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, width, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = prize.color;
+                ctx.fill();
+                
+                // 绘制分割线
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + width * Math.cos(startAngle), centerY + width * Math.sin(startAngle));
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // 绘制奖项名称
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + angle / 2);
+                ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'center';
+                ctx.fillText(prize.name, width * 0.6, 8);
+                
+                // 绘制奖项图片（使用占位符图像，实际图片会在加载后显示）
+                if (prize.image) {
+                    const img = new Image();
+                    img.src = prize.image;
+                    img.onload = function() {
+                        // 由于图片加载是异步的，这里需要重新获取画布上下文并设置相同的变换
+                        const tempCtx = document.getElementById('turntableCanvas').getContext('2d');
+                        tempCtx.save();
+                        tempCtx.translate(centerX, centerY);
+                        tempCtx.rotate(startAngle + angle / 2);
+                        
+                        // 计算图片尺寸和位置
+                        const imgSize = 40; // 图片大小
+                        const imgX = width * 0.4;
+                        const imgY = -20;
+                        
+                        // 绘制图片
+                        tempCtx.drawImage(img, imgX, imgY, imgSize, imgSize);
+                        tempCtx.restore();
+                    };
+                }
+                
+                ctx.restore();
+            }
+            
+            // 绘制内圆
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 50, 0, 2 * Math.PI);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+        }
+
+        // 开始抽奖
+        function startRotate() {
+            // 检查是否还有抽奖次数
+            if (remainingChances <= 0) {
+                alert('抽奖次数已用完');
+                return;
+            }
+            
+            // 防止重复点击
+            if (isRotating) {
+                return;
+            }
+            
+            // 设置旋转中状态
+            isRotating = true;
+            startBtn.textContent = '抽奖中...';
+            startBtn.classList.add('disabled');
+            startBtn.disabled = true;
+            
+            // 随机选择一个奖项
+            const prizeIndex = selectPrize();
+            const prize = prizes[prizeIndex];
+            
+            // 计算旋转角度和动画时间
+            const angle = 360 / prizes.length;
+            const targetDeg = 360 * 5 + (prizes.length - 1 - prizeIndex) * angle + (angle / 2);
+            const duration = 5000; // 旋转动画持续时间（毫秒）
+            
+            // 更新样式，触发旋转动画
+            turntable.style.transition = `transform ${duration}ms ease-out`;
+            turntable.style.transform = `rotate(${targetDeg}deg)`;
+            
+            // 减少抽奖次数并保存
+            remainingChances--;
+            saveChances();
+            updateChancesTip();
+            
+            // 动画结束后显示结果
+            setTimeout(() => {
+                showResult(prize);
+            }, duration);
+        }
+
+        // 随机选择奖项
+        function selectPrize() {
+            // 计算总概率
+            let totalProbability = 0;
+            for (const prize of prizes) {
+                totalProbability += prize.probability;
+            }
+            
+            // 生成随机数
+            const random = Math.random() * totalProbability;
+            
+            // 根据概率选择奖项
+            let cumulativeProbability = 0;
+            for (let i = 0; i < prizes.length; i++) {
+                cumulativeProbability += prizes[i].probability;
+                if (random < cumulativeProbability) {
+                    return i;
+                }
+            }
+            
+            // 默认返回最后一个奖项
+            return prizes.length - 1;
+        }
+
+        // 显示抽奖结果
+        function showResult(prize) {
+            // 重置旋转状态
+            isRotating = false;
+            
+            // 恢复按钮状态
+            if (remainingChances > 0) {
+                startBtn.textContent = '开始抽奖';
+                startBtn.classList.remove('disabled');
+                startBtn.disabled = false;
+            } else {
+                startBtn.textContent = '抽奖次数已用完';
+            }
+            
+            // 设置结果信息
+            if (prize.name === '谢谢参与') {
+                resultIcon.className = 'result-icon fail';
+                resultIcon.textContent = '✗';
+                resultTitle.textContent = '再接再厉！';
+                resultMessage.textContent = prize.value;
+            } else {
+                resultIcon.className = 'result-icon success';
+                resultIcon.textContent = '✓';
+                resultTitle.textContent = '恭喜中奖！';
+                resultMessage.textContent = '恭喜获得 ' + prize.value;
+            }
+            
+            // 显示结果弹窗
+            resultModal.style.display = 'flex';
+        }
+
+        // 关闭结果弹窗
+        function closeResult() {
+            resultModal.style.display = 'none';
+        }
+
+        // 初始化微信分享
+        function initWechatShare() {
+            // 检测是否在微信环境中
+            const isWechat = /MicroMessenger/i.test(navigator.userAgent);
+            
+            if (isWechat) {
+                // 这里需要后端提供签名等信息
+                // 实际使用时需要替换为真实的接口调用
+                /*
+                wx.config({
+                    debug: false,
+                    appId: '', // 必填，公众号的唯一标识
+                    timestamp: '', // 必填，生成签名的时间戳
+                    nonceStr: '', // 必填，生成签名的随机串
+                    signature: '',// 必填，签名
+                    jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
+                });
+                
+                wx.ready(function() {
+                    // 分享给朋友
+                    wx.onMenuShareAppMessage({
+                        title: '幸运抽奖转盘', // 分享标题
+                        desc: '快来试试手气，抽大奖！', // 分享描述
+                        link: window.location.href, // 分享链接
+                        imgUrl: '../assets/images/share.svg', // 分享图标
+                        type: '', // 分享类型,music、video或link，不填默认为link
+                        dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                        success: function() {
+                            // 用户确认分享后执行的回调函数
+                        },
+                        cancel: function() {
+                            // 用户取消分享后执行的回调函数
+                        }
+                    });
+                    
+                    // 分享到朋友圈
+                    wx.onMenuShareTimeline({
+                        title: '幸运抽奖转盘', // 分享标题
+                        link: window.location.href, // 分享链接
+                        imgUrl: '../assets/images/share.svg', // 分享图标
+                        success: function() {
+                            // 用户确认分享后执行的回调函数
+                        },
+                        cancel: function() {
+                            // 用户取消分享后执行的回调函数
+                        }
+                    });
+                });
+                */
+            }
+        }
+
+        // 测试旋转（不消耗抽奖次数）
+        function testRotate() {
+            // 防止重复点击
+            if (isRotating) {
+                return;
+            }
+            
+            // 设置旋转中状态
+            isRotating = true;
+            startBtn.textContent = '抽奖中...';
+            startBtn.classList.add('disabled');
+            startBtn.disabled = true;
+            testBtn.textContent = '测试中...';
+            testBtn.classList.add('disabled');
+            testBtn.disabled = true;
+            
+            // 随机选择一个奖项
+            const prizeIndex = selectPrize();
+            const prize = prizes[prizeIndex];
+            
+            // 计算旋转角度和动画时间
+            const angle = 360 / prizes.length;
+            const targetDeg = 360 * 5 + (prizes.length - 1 - prizeIndex) * angle + (angle / 2);
+            const duration = 5000; // 旋转动画持续时间（毫秒）
+            
+            // 更新样式，触发旋转动画
+            turntable.style.transition = `transform ${duration}ms ease-out`;
+            turntable.style.transform = `rotate(${targetDeg}deg)`;
+            
+            // 动画结束后显示结果
+            setTimeout(() => {
+                // 重置旋转状态
+                isRotating = false;
+                
+                // 恢复按钮状态
+                startBtn.textContent = '开始抽奖';
+                if (remainingChances > 0) {
+                    startBtn.classList.remove('disabled');
+                    startBtn.disabled = false;
+                }
+                testBtn.textContent = '测试转盘';
+                testBtn.classList.remove('disabled');
+                testBtn.disabled = false;
+                
+                // 设置结果信息
+                resultIcon.className = 'result-icon success';
+                resultIcon.textContent = '✓';
+                resultTitle.textContent = '测试结果';
+                resultMessage.textContent = '模拟获得 ' + prize.value;
+                
+                // 显示结果弹窗
+                resultModal.style.display = 'flex';
+            }, duration);
+        }
+    </script>
 </body>
 </html>
