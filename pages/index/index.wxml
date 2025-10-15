@@ -1,0 +1,53 @@
+<view class="container">
+  <!-- 头部信息 -->
+  <view class="header">
+    <image class="logo" src="/assets/images/logo.svg" mode="aspectFit"></image>
+    <text class="title">幸运抽奖转盘</text>
+    <text class="subtitle">试试你的运气吧！</text>
+  </view>
+
+  <!-- 抽奖区域 -->
+  <view class="lottery-area">
+    <!-- 转盘容器 -->
+    <view class="turntable-container">
+      <!-- 转盘 -->
+      <view class="turntable" style="transform: rotate({{deg}}deg); transition: transform {{duration}}ms ease-out;">
+        <canvas canvas-id="turntableCanvas" style="width: 100%; height: 100%;"/>
+      </view>
+      <!-- 转盘指针 -->
+      <view class="pointer-container">
+        <image class="pointer" src="/assets/images/pointer.svg" mode="aspectFit"></image>
+      </view>
+    </view>
+
+    <!-- 抽奖按钮 -->
+    <button class="start-btn {{isRotating ? 'disabled' : ''}}" bindtap="startRotate" disabled="{{isRotating}}">
+      {{isRotating ? '抽奖中...' : '开始抽奖'}}
+    </button>
+
+    <!-- 抽奖次数提示 -->
+    <text class="tips">{{remainingChances > 0 ? '剩余抽奖次数：' + remainingChances : '抽奖次数已用完'}}</text>
+  </view>
+
+  <!-- 抽奖结果弹窗 -->
+  <view class="result-modal" wx:if="{{showResult}}">
+    <view class="result-content">
+      <view class="result-icon {{prizeType === 'success' ? 'success' : 'fail'}}">
+        <text>{{prizeType === 'success' ? '✓' : '✗'}}</text>
+      </view>
+      <text class="result-title">{{prizeType === 'success' ? '恭喜中奖！' : '再接再厉！'}}</text>
+      <text class="result-message">{{prizeMessage}}</text>
+      <button class="result-btn" bindtap="closeResult">确定</button>
+    </view>
+  </view>
+
+  <!-- 抽奖规则说明 -->
+  <view class="rules-section">
+    <text class="rules-title">抽奖规则</text>
+    <view class="rules-content">
+      <text>1. 每人每天有{{maxChances}}次抽奖机会</text>
+      <text>2. 中奖后请按提示领取奖品</text>
+      <text>3. 活动最终解释权归主办方所有</text>
+    </view>
+  </view>
+</view>

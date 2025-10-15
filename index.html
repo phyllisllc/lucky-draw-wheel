@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>幸运抽奖转盘</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部信息 -->
+        <div class="header">
+            <img class="logo" src="assets/images/logo.svg" alt="幸运抽奖转盘">
+            <h1 class="title">幸运抽奖转盘</h1>
+            <p class="subtitle">试试你的运气吧！</p>
+        </div>
+
+        <!-- 抽奖区域 -->
+        <div class="lottery-area">
+            <!-- 转盘容器 -->
+            <div class="turntable-container">
+                <!-- 转盘 -->
+                <div class="turntable" id="turntable" style="transform: rotate(0deg); transition: transform 0ms ease-out;">
+                    <canvas id="turntableCanvas" width="600" height="600"></canvas>
+                </div>
+                <!-- 转盘指针 -->
+                <div class="pointer-container">
+                    <img class="pointer" src="assets/images/pointer.svg" alt="指针">
+                </div>
+            </div>
+
+            <!-- 抽奖按钮 -->
+            <button class="start-btn" id="startBtn">开始抽奖</button>
+
+            <!-- 抽奖次数提示 -->
+            <p class="tips" id="chancesTip">剩余抽奖次数：3</p>
+        </div>
+
+        <!-- 抽奖结果弹窗 -->
+        <div class="result-modal" id="resultModal">
+            <div class="result-content">
+                <div class="result-icon" id="resultIcon"></div>
+                <h2 class="result-title" id="resultTitle"></h2>
+                <p class="result-message" id="resultMessage"></p>
+                <button class="result-btn" id="closeBtn">确定</button>
+            </div>
+        </div>
+
+        <!-- 抽奖规则说明 -->
+        <div class="rules-section">
+            <h3 class="rules-title">抽奖规则</h3>
+            <div class="rules-content">
+                <p>1. 每人每天有3次抽奖机会</p>
+                <p>2. 中奖后请按提示领取奖品</p>
+                <p>3. 活动最终解释权归主办方所有</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

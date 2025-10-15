@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300">
+  <!-- 背景 -->
+  <rect width="500" height="300" fill="#f8f8f8"/>
+  
+  <!-- 标题 -->
+  <text x="250" y="60" font-family="Arial, sans-serif" font-size="40" font-weight="bold" text-anchor="middle" fill="#333">幸运抽奖转盘</text>
+  
+  <!-- 转盘图片 -->
+  <circle cx="250" cy="160" r="100" fill="#ff6700"/>
+  <circle cx="250" cy="160" r="85" fill="white"/>
+  
+  <!-- 简化的转盘分区 -->
+  <g transform="translate(250, 160)">
+    <path d="M0,0 L80,0 A80,80 0 0,1 56.57,56.57 Z" fill="#FFD700"/>
+    <path d="M0,0 L56.57,56.57 A80,80 0 0,1 -56.57,56.57 Z" fill="#C0C0C0"/>
+    <path d="M0,0 L-56.57,56.57 A80,80 0 0,1 -80,0 Z" fill="#CD7F32"/>
+    <path d="M0,0 L-80,0 A80,80 0 0,1 -56.57,-56.57 Z" fill="#FF6B6B"/>
+    <path d="M0,0 L-56.57,-56.57 A80,80 0 0,1 56.57,-56.57 Z" fill="#4ECDC4"/>
+    <path d="M0,0 L56.57,-56.57 A80,80 0 0,1 80,0 Z" fill="#E9ECEF"/>
+    <circle cx="0" cy="0" r="20" fill="#ff6700"/>
+  </g>
+  
+  <!-- 下载提示 -->
+  <text x="250" y="280" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#666">快来试试你的运气吧！</text>
+</svg>
