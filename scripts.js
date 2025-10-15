@@ -124,7 +124,7 @@ function drawTurntable() {
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.rotate(startAngle + angle / 2);
-        ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.font = '30px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.fillStyle = '#fff';
         ctx.textAlign = 'center';
         ctx.fillText(prize.name, width * 0.6, 8);
