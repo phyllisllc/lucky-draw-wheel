@@ -576,7 +576,49 @@
         const phoneError = document.getElementById('phoneError');
         const phoneConfirmBtn = document.getElementById('phoneConfirmBtn');
         const phoneCancelBtn = document.getElementById('phoneCancelBtn');
-        let validatedPhoneNumber = localStorage.getItem('validatedPhoneNumber'); // 存储已验证的手机号
+        
+        // 手机号码收集相关
+        let validatedPhoneNumber = null; // 当前验证的手机号
+        let collectedPhones = JSON.parse(localStorage.getItem('collectedPhones')) || []; // 收集的手机号列表
+        
+        // 测试用：添加一些模拟数据（仅在没有数据时添加）
+        if (collectedPhones.length === 0) {
+            collectedPhones = [
+                { phone: '13812345678', timestamp: '2024-04-20 10:30:45' },
+                { phone: '13987654321', timestamp: '2024-04-20 11:45:22' }
+            ];
+            localStorage.setItem('collectedPhones', JSON.stringify(collectedPhones));
+        }
+        
+        // 确保每次都需要重新验证
+        localStorage.removeItem('validatedPhoneNumber');
+        
+        // 添加一个简单的提示信息
+        function showAdminToolsInfo() {
+            const infoDiv = document.createElement('div');
+            infoDiv.textContent = '💡 提示：页面右下角有管理按钮，可用于查看、导出和管理收集的手机号数据';
+            infoDiv.style.position = 'fixed';
+            infoDiv.style.top = '20px';
+            infoDiv.style.left = '50%';
+            infoDiv.style.transform = 'translateX(-50%)';
+            infoDiv.style.zIndex = '9999';
+            infoDiv.style.padding = '10px 20px';
+            infoDiv.style.backgroundColor = 'rgba(76, 175, 80, 0.9)';
+            infoDiv.style.color = 'white';
+            infoDiv.style.borderRadius = '5px';
+            infoDiv.style.fontSize = '14px';
+            infoDiv.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+            document.body.appendChild(infoDiv);
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                infoDiv.style.opacity = '0';
+                infoDiv.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    document.body.removeChild(infoDiv);
+                }, 500);
+            }, 5000);
+        }
 
         // 页面加载完成后初始化
         window.onload = function() {
@@ -591,6 +633,11 @@
             // 绘制转盘
             drawTurntable();
             
+            // 打印初始验证状态，便于调试
+            console.log('初始验证状态:', validatedPhoneNumber);
+            console.log('已收集手机号数量:', collectedPhones.length);
+            console.log('手机号列表:', collectedPhones);
+            
             // 添加事件监听
             startBtn.addEventListener('click', startRotate);
             testBtn.addEventListener('click', testRotate);
@@ -601,6 +648,79 @@
             
             // 初始化微信分享
             initWechatShare();
+            
+            // 显示管理工具提示
+            showAdminToolsInfo();
+            
+            // 添加管理按钮（所有环境都可见）
+            // 导出按钮
+            const exportBtn = document.createElement('button');
+            exportBtn.textContent = '导出手机号数据';
+            exportBtn.style.position = 'fixed';
+            exportBtn.style.bottom = '20px';
+            exportBtn.style.right = '20px';
+            exportBtn.style.zIndex = '9999';
+            exportBtn.style.padding = '10px 20px';
+            exportBtn.style.backgroundColor = '#4CAF50';
+            exportBtn.style.color = 'white';
+            exportBtn.style.border = 'none';
+            exportBtn.style.borderRadius = '5px';
+            exportBtn.style.cursor = 'pointer';
+            exportBtn.addEventListener('click', exportPhoneData);
+            document.body.appendChild(exportBtn);
+            
+            // 查看按钮
+            const viewBtn = document.createElement('button');
+            viewBtn.textContent = '查看已收集手机号';
+            viewBtn.style.position = 'fixed';
+            viewBtn.style.bottom = '20px';
+            viewBtn.style.right = '200px';
+            viewBtn.style.zIndex = '9999';
+            viewBtn.style.padding = '10px 20px';
+            viewBtn.style.backgroundColor = '#2196F3';
+            viewBtn.style.color = 'white';
+            viewBtn.style.border = 'none';
+            viewBtn.style.borderRadius = '5px';
+            viewBtn.style.cursor = 'pointer';
+            viewBtn.addEventListener('click', function() {
+                if (collectedPhones.length === 0) {
+                    alert('暂无收集到的手机号数据');
+                } else {
+                    // 在控制台显示详细数据
+                    console.log('完整手机号列表:', collectedPhones);
+                    // 简单弹窗显示数量和部分信息
+                    const phoneListText = collectedPhones.map((item, index) => 
+                        `${index + 1}. ${item.phone} (${item.timestamp})`
+                    ).join('\n');
+                    alert(`共收集到 ${collectedPhones.length} 个手机号\n\n${phoneListText}`);
+                }
+            });
+            document.body.appendChild(viewBtn);
+            
+            // 清空按钮
+            const clearBtn = document.createElement('button');
+            clearBtn.textContent = '清空收集数据';
+            clearBtn.style.position = 'fixed';
+            clearBtn.style.bottom = '20px';
+            clearBtn.style.right = '380px';
+            clearBtn.style.zIndex = '9999';
+            clearBtn.style.padding = '10px 20px';
+            clearBtn.style.backgroundColor = '#f44336';
+            clearBtn.style.color = 'white';
+            clearBtn.style.border = 'none';
+            clearBtn.style.borderRadius = '5px';
+            clearBtn.style.cursor = 'pointer';
+            clearBtn.addEventListener('click', function() {
+                if (confirm('确定要清空所有收集的手机号数据吗？此操作不可恢复。')) {
+                    collectedPhones = [];
+                    localStorage.removeItem('collectedPhones');
+                    localStorage.removeItem('validatedPhoneNumber');
+                    validatedPhoneNumber = null;
+                    alert('数据已清空');
+                    console.log('已清空收集的手机号数据');
+                }
+            });
+            document.body.appendChild(clearBtn);
         }
 
         // 验证手机号格式
@@ -644,9 +764,49 @@
             validatedPhoneNumber = phoneNumber;
             localStorage.setItem('validatedPhoneNumber', phoneNumber);
             
+            // 添加到收集列表（如果不存在）
+            const isPhoneExists = collectedPhones.some(item => item.phone === phoneNumber);
+            if (!isPhoneExists) {
+                collectedPhones.push({
+                    phone: phoneNumber,
+                    timestamp: new Date().toLocaleString()
+                });
+                localStorage.setItem('collectedPhones', JSON.stringify(collectedPhones));
+                console.log('手机号已添加到收集列表');
+            }
+            
             // 关闭弹窗并继续抽奖
             closePhoneModal();
             performRotate();
+        }
+        
+        // 导出手机号数据为CSV
+        function exportPhoneData() {
+            if (collectedPhones.length === 0) {
+                alert('暂无收集到的手机号数据');
+                return;
+            }
+            
+            // 创建CSV内容
+            let csvContent = '电话号,提交时间\n';
+            collectedPhones.forEach(item => {
+                csvContent += `${item.phone},"${item.timestamp}"\n`;
+            });
+            
+            // 创建Blob对象
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            
+            // 创建下载链接
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `电话号码数据_${new Date().toISOString().slice(0,10)}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         }
 
         // 从本地存储加载抽奖次数
@@ -927,6 +1087,12 @@
         function testRotate() {
             // 防止重复点击
             if (isRotating) {
+                return;
+            }
+            
+            // 检查是否已验证手机号
+            if (!validatedPhoneNumber) {
+                showPhoneModal();
                 return;
             }
             
