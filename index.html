@@ -593,31 +593,154 @@
         // 确保每次都需要重新验证
         localStorage.removeItem('validatedPhoneNumber');
         
-        // 添加一个简单的提示信息
-        function showAdminToolsInfo() {
-            const infoDiv = document.createElement('div');
-            infoDiv.textContent = '💡 提示：页面右下角有管理按钮，可用于查看、导出和管理收集的手机号数据';
-            infoDiv.style.position = 'fixed';
-            infoDiv.style.top = '20px';
-            infoDiv.style.left = '50%';
-            infoDiv.style.transform = 'translateX(-50%)';
-            infoDiv.style.zIndex = '9999';
-            infoDiv.style.padding = '10px 20px';
-            infoDiv.style.backgroundColor = 'rgba(76, 175, 80, 0.9)';
-            infoDiv.style.color = 'white';
-            infoDiv.style.borderRadius = '5px';
-            infoDiv.style.fontSize = '14px';
-            infoDiv.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-            document.body.appendChild(infoDiv);
+        // 创建密码验证弹窗
+        function createPasswordModal() {
+            // 检查是否已存在密码弹窗
+            if (document.getElementById('passwordModal')) {
+                return;
+            }
             
-            // 3秒后自动隐藏
-            setTimeout(() => {
-                infoDiv.style.opacity = '0';
-                infoDiv.style.transition = 'opacity 0.5s ease';
-                setTimeout(() => {
-                    document.body.removeChild(infoDiv);
-                }, 500);
-            }, 5000);
+            const modal = document.createElement('div');
+            modal.id = 'passwordModal';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            modal.style.display = 'none';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.zIndex = '10000';
+            document.body.appendChild(modal);
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.backgroundColor = 'white';
+            modalContent.style.padding = '30px';
+            modalContent.style.borderRadius = '10px';
+            modalContent.style.width = '90%';
+            modalContent.style.maxWidth = '400px';
+            modalContent.style.textAlign = 'center';
+            modal.appendChild(modalContent);
+            
+            const title = document.createElement('h3');
+            title.textContent = '输入管理员密码';
+            title.style.marginBottom = '20px';
+            modalContent.appendChild(title);
+            
+            const passwordInput = document.createElement('input');
+            passwordInput.id = 'passwordInput';
+            passwordInput.type = 'password';
+            passwordInput.style.width = '100%';
+            passwordInput.style.padding = '10px';
+            passwordInput.style.fontSize = '16px';
+            passwordInput.style.border = '1px solid #ccc';
+            passwordInput.style.borderRadius = '5px';
+            passwordInput.style.marginBottom = '20px';
+            passwordInput.style.textAlign = 'center';
+            passwordInput.placeholder = '请输入数字密码';
+            passwordInput.maxLength = '3';
+            // 限制只能输入数字
+            passwordInput.oninput = function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            };
+            modalContent.appendChild(passwordInput);
+            
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.style.display = 'flex';
+            buttonsContainer.style.justifyContent = 'space-between';
+            buttonsContainer.style.gap = '10px';
+            modalContent.appendChild(buttonsContainer);
+            
+            const confirmBtn = document.createElement('button');
+            confirmBtn.textContent = '确定';
+            confirmBtn.style.flex = '1';
+            confirmBtn.style.padding = '10px';
+            confirmBtn.style.backgroundColor = '#4CAF50';
+            confirmBtn.style.color = 'white';
+            confirmBtn.style.border = 'none';
+            confirmBtn.style.borderRadius = '5px';
+            confirmBtn.style.cursor = 'pointer';
+            confirmBtn.addEventListener('click', function() {
+                const password = passwordInput.value;
+                if (password === '323') {
+                    modal.style.display = 'none';
+                    showAdminTools();
+                } else {
+                    alert('密码错误，请重试');
+                    passwordInput.value = '';
+                }
+            });
+            buttonsContainer.appendChild(confirmBtn);
+            
+            const cancelBtn = document.createElement('button');
+            cancelBtn.textContent = '取消';
+            cancelBtn.style.flex = '1';
+            cancelBtn.style.padding = '10px';
+            cancelBtn.style.backgroundColor = '#f44336';
+            cancelBtn.style.color = 'white';
+            cancelBtn.style.border = 'none';
+            cancelBtn.style.borderRadius = '5px';
+            cancelBtn.style.cursor = 'pointer';
+            cancelBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+                passwordInput.value = '';
+            });
+            buttonsContainer.appendChild(cancelBtn);
+        }
+        
+        // 显示管理员工具（在密码验证成功后）
+        function showAdminTools() {
+            // 检查是否已经显示了管理工具
+            if (document.getElementById('adminToolsContainer')) {
+                return;
+            }
+            
+            const container = document.createElement('div');
+            container.id = 'adminToolsContainer';
+            container.style.position = 'fixed';
+            container.style.bottom = '20px';
+            container.style.right = '20px';
+            container.style.zIndex = '9999';
+            container.style.display = 'flex';
+            container.style.gap = '10px';
+            document.body.appendChild(container);
+            
+            // 查看按钮
+            const viewBtn = document.createElement('button');
+            viewBtn.textContent = '查看手机号';
+            viewBtn.style.padding = '10px 20px';
+            viewBtn.style.backgroundColor = '#2196F3';
+            viewBtn.style.color = 'white';
+            viewBtn.style.border = 'none';
+            viewBtn.style.borderRadius = '5px';
+            viewBtn.style.cursor = 'pointer';
+            viewBtn.addEventListener('click', function() {
+                if (collectedPhones.length === 0) {
+                    alert('暂无收集到的手机号数据');
+                } else {
+                    // 在控制台显示详细数据
+                    console.log('完整手机号列表:', collectedPhones);
+                    // 简单弹窗显示数量和部分信息
+                    const phoneListText = collectedPhones.map((item, index) => 
+                        `${index + 1}. ${item.phone} (${item.timestamp})`
+                    ).join('\n');
+                    alert(`共收集到 ${collectedPhones.length} 个手机号\n\n${phoneListText}`);
+                }
+            });
+            container.appendChild(viewBtn);
+            
+            // 导出按钮
+            const exportBtn = document.createElement('button');
+            exportBtn.textContent = '导出数据';
+            exportBtn.style.padding = '10px 20px';
+            exportBtn.style.backgroundColor = '#4CAF50';
+            exportBtn.style.color = 'white';
+            exportBtn.style.border = 'none';
+            exportBtn.style.borderRadius = '5px';
+            exportBtn.style.cursor = 'pointer';
+            exportBtn.addEventListener('click', exportPhoneData);
+            container.appendChild(exportBtn);
         }
 
         // 页面加载完成后初始化
@@ -649,78 +772,35 @@
             // 初始化微信分享
             initWechatShare();
             
-            // 显示管理工具提示
-            showAdminToolsInfo();
+            // 创建密码验证弹窗（但不显示）
+            createPasswordModal();
             
-            // 添加管理按钮（所有环境都可见）
-            // 导出按钮
-            const exportBtn = document.createElement('button');
-            exportBtn.textContent = '导出手机号数据';
-            exportBtn.style.position = 'fixed';
-            exportBtn.style.bottom = '20px';
-            exportBtn.style.right = '20px';
-            exportBtn.style.zIndex = '9999';
-            exportBtn.style.padding = '10px 20px';
-            exportBtn.style.backgroundColor = '#4CAF50';
-            exportBtn.style.color = 'white';
-            exportBtn.style.border = 'none';
-            exportBtn.style.borderRadius = '5px';
-            exportBtn.style.cursor = 'pointer';
-            exportBtn.addEventListener('click', exportPhoneData);
-            document.body.appendChild(exportBtn);
-            
-            // 查看按钮
-            const viewBtn = document.createElement('button');
-            viewBtn.textContent = '查看已收集手机号';
-            viewBtn.style.position = 'fixed';
-            viewBtn.style.bottom = '20px';
-            viewBtn.style.right = '200px';
-            viewBtn.style.zIndex = '9999';
-            viewBtn.style.padding = '10px 20px';
-            viewBtn.style.backgroundColor = '#2196F3';
-            viewBtn.style.color = 'white';
-            viewBtn.style.border = 'none';
-            viewBtn.style.borderRadius = '5px';
-            viewBtn.style.cursor = 'pointer';
-            viewBtn.addEventListener('click', function() {
-                if (collectedPhones.length === 0) {
-                    alert('暂无收集到的手机号数据');
-                } else {
-                    // 在控制台显示详细数据
-                    console.log('完整手机号列表:', collectedPhones);
-                    // 简单弹窗显示数量和部分信息
-                    const phoneListText = collectedPhones.map((item, index) => 
-                        `${index + 1}. ${item.phone} (${item.timestamp})`
-                    ).join('\n');
-                    alert(`共收集到 ${collectedPhones.length} 个手机号\n\n${phoneListText}`);
+            // 添加"已参与"按钮
+            const participatedBtn = document.createElement('button');
+            participatedBtn.textContent = '已参与';
+            participatedBtn.style.position = 'fixed';
+            participatedBtn.style.bottom = '20px';
+            participatedBtn.style.right = '20px';
+            participatedBtn.style.zIndex = '9999';
+            participatedBtn.style.padding = '10px 20px';
+            participatedBtn.style.backgroundColor = '#9C27B0';
+            participatedBtn.style.color = 'white';
+            participatedBtn.style.border = 'none';
+            participatedBtn.style.borderRadius = '5px';
+            participatedBtn.style.cursor = 'pointer';
+            participatedBtn.addEventListener('click', function() {
+                const passwordModal = document.getElementById('passwordModal');
+                if (passwordModal) {
+                    passwordModal.style.display = 'flex';
+                    // 清空密码输入框
+                    const passwordInput = document.getElementById('passwordInput');
+                    if (passwordInput) {
+                        passwordInput.value = '';
+                        passwordInput.focus();
+                    }
                 }
             });
-            document.body.appendChild(viewBtn);
-            
-            // 清空按钮
-            const clearBtn = document.createElement('button');
-            clearBtn.textContent = '清空收集数据';
-            clearBtn.style.position = 'fixed';
-            clearBtn.style.bottom = '20px';
-            clearBtn.style.right = '380px';
-            clearBtn.style.zIndex = '9999';
-            clearBtn.style.padding = '10px 20px';
-            clearBtn.style.backgroundColor = '#f44336';
-            clearBtn.style.color = 'white';
-            clearBtn.style.border = 'none';
-            clearBtn.style.borderRadius = '5px';
-            clearBtn.style.cursor = 'pointer';
-            clearBtn.addEventListener('click', function() {
-                if (confirm('确定要清空所有收集的手机号数据吗？此操作不可恢复。')) {
-                    collectedPhones = [];
-                    localStorage.removeItem('collectedPhones');
-                    localStorage.removeItem('validatedPhoneNumber');
-                    validatedPhoneNumber = null;
-                    alert('数据已清空');
-                    console.log('已清空收集的手机号数据');
-                }
-            });
-            document.body.appendChild(clearBtn);
+            document.body.appendChild(participatedBtn);
         }
 
         // 验证手机号格式
