@@ -91,6 +91,11 @@
                 </button>
             </div>
             
+            <!-- 测试按钮 -->
+            <button id="test-btn" class="w-full mt-3 py-2 bg-secondary text-white rounded-lg font-medium transition-colors hover:bg-secondary/90">
+                <i class="fa fa-cog mr-1"></i> 测试转盘
+            </button>
+
             <!-- 抽奖记录 -->
             <div class="mt-3">
                 <h3 class="text-sm font-medium text-gray-600 mb-2">最近抽奖记录</h3>
@@ -174,6 +179,7 @@
         let remainingSpins;
         let isSpinning;
         let spinHistory;
+        let testBtn;
         
         // DOM元素引用
         let wheel, spinBtn, remainingSpinsEl, spinHistoryEl, prizeContainer;
@@ -279,6 +285,44 @@
             }, 3000);
         }
         
+        // 测试旋转转盘（不消耗抽奖次数）
+        function testSpinWheel() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            
+            // 选择奖品
+            const selectedIndex = selectPrize();
+            const selectedPrize = prizes[selectedIndex];
+            
+            // 计算旋转角度（额外转5-8圈）
+            const baseRotation = 360 * (5 + Math.random() * 3);
+            const segmentAngle = 360 / prizes.length;
+            // 确保指针指向奖品的中心
+            const targetRotation = baseRotation + (360 - selectedIndex * segmentAngle - segmentAngle / 2);
+            
+            // 应用旋转动画
+            wheel.style.transform = `rotate(${targetRotation}deg)`;
+            
+            // 动画结束后显示结果
+            setTimeout(() => {
+                // 显示测试结果
+                if (selectedPrize.name === '谢谢参与') {
+                    resultTitle.textContent = '测试结果';
+                    resultIcon.className = 'fa fa-meh-o text-4xl text-white';
+                    shareBtn.style.display = 'none';
+                } else {
+                    resultTitle.textContent = '测试结果';
+                    resultIcon.className = `fa ${selectedPrize.icon} text-4xl text-white`;
+                    shareBtn.style.display = 'none';
+                }
+                
+                resultMessage.textContent = `模拟获得了${selectedPrize.name}`;
+                resultModal.classList.remove('hidden');
+                isSpinning = false;
+            }, 3000);
+        }
+        
         // 更新历史记录
         function updateHistory() {
             spinHistoryEl.innerHTML = '';
@@ -321,6 +365,7 @@
             // 获取DOM元素
             wheel = document.getElementById('wheel');
             spinBtn = document.getElementById('spin-btn').parentElement;
+            testBtn = document.getElementById('test-btn');
             remainingSpinsEl = document.getElementById('remaining-spins');
             spinHistoryEl = document.getElementById('spin-history');
             prizeContainer = document.getElementById('prize-container');
@@ -343,6 +388,7 @@
             
             // 添加事件监听
             spinBtn.addEventListener('click', spinWheel);
+            testBtn.addEventListener('click', testSpinWheel);
             
             // 规则弹窗
             ruleBtn.addEventListener('click', () => {

@@ -135,6 +135,34 @@ body {
     cursor: not-allowed;
 }
 
+/* 测试按钮 */
+.test-btn {
+    width: 200px;
+    height: 45px;
+    line-height: 45px;
+    background: linear-gradient(135deg, #4ECDC4 0%, #45B7AA 100%);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 22.5px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(78, 205, 196, 0.4);
+    border: none;
+    outline: none;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.test-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(78, 205, 196, 0.5);
+}
+
+.test-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(78, 205, 196, 0.4);
+}
+
 /* 提示信息 */
 .tips {
     font-size: 16px;

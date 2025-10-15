@@ -20,6 +20,7 @@ const turntable = document.getElementById('turntable');
 const canvas = document.getElementById('turntableCanvas');
 const ctx = canvas.getContext('2d');
 const startBtn = document.getElementById('startBtn');
+const testBtn = document.getElementById('testBtn');
 const chancesTip = document.getElementById('chancesTip');
 const resultModal = document.getElementById('resultModal');
 const resultIcon = document.getElementById('resultIcon');
@@ -42,6 +43,7 @@ function init() {
     
     // 添加事件监听
     startBtn.addEventListener('click', startRotate);
+    testBtn.addEventListener('click', testRotate);
     closeBtn.addEventListener('click', closeResult);
     
     // 初始化微信分享
@@ -285,6 +287,60 @@ function initWechatShare() {
                 }
             });
         });
-        */
     }
+
+
+// 测试旋转（不消耗抽奖次数）
+function testRotate() {
+    // 防止重复点击
+    if (isRotating) {
+        return;
+    }
+    
+    // 设置旋转中状态
+    isRotating = true;
+    startBtn.textContent = '抽奖中...';
+    startBtn.classList.add('disabled');
+    startBtn.disabled = true;
+    testBtn.textContent = '测试中...';
+    testBtn.classList.add('disabled');
+    testBtn.disabled = true;
+    
+    // 随机选择一个奖项
+    const prizeIndex = selectPrize();
+    const prize = prizes[prizeIndex];
+    
+    // 计算旋转角度和动画时间
+    const angle = 360 / prizes.length;
+    const targetDeg = 360 * 5 + (prizes.length - 1 - prizeIndex) * angle + (angle / 2);
+    const duration = 5000; // 旋转动画持续时间（毫秒）
+    
+    // 更新样式，触发旋转动画
+    turntable.style.transition = `transform ${duration}ms ease-out`;
+    turntable.style.transform = `rotate(${targetDeg}deg)`;
+    
+    // 动画结束后显示结果
+    setTimeout(() => {
+        // 重置旋转状态
+        isRotating = false;
+        
+        // 恢复按钮状态
+        startBtn.textContent = '开始抽奖';
+        if (remainingChances > 0) {
+            startBtn.classList.remove('disabled');
+            startBtn.disabled = false;
+        }
+        testBtn.textContent = '测试转盘';
+        testBtn.classList.remove('disabled');
+        testBtn.disabled = false;
+        
+        // 设置结果信息
+        resultIcon.className = 'result-icon success';
+        resultIcon.textContent = '✓';
+        resultTitle.textContent = '测试结果';
+        resultMessage.textContent = '模拟获得 ' + prize.value;
+        
+        // 显示结果弹窗
+        resultModal.style.display = 'flex';
+    }, duration);
 }
