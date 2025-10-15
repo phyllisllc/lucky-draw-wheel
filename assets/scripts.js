@@ -45,6 +45,15 @@ function init() {
     startBtn.addEventListener('click', startRotate);
     closeBtn.addEventListener('click', closeResult);
     
+    // 窗口大小改变时重新绘制转盘
+    window.addEventListener('resize', function() {
+        // 重置canvas上下文的缩放
+        const dpr = window.devicePixelRatio || 1;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        // 重新绘制转盘
+        drawTurntable();
+    });
+    
     // 初始化微信分享
     initWechatShare();
 }
@@ -87,7 +96,29 @@ function updateChancesTip() {
 
 // 绘制转盘
 function drawTurntable() {
-    const width = canvas.width / 2; // 转盘半径
+    // 确保canvas分辨率与显示尺寸一致，防止变形
+    const updateCanvasSize = () => {
+        const container = canvas.parentElement;
+        const rect = container.getBoundingClientRect();
+        
+        // 设置canvas的内部分辨率
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        
+        // 调整绘图上下文比例
+        ctx.scale(dpr, dpr);
+        
+        // 设置canvas的CSS尺寸
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+    };
+    
+    // 更新canvas尺寸
+    updateCanvasSize();
+    
+    // 重新计算转盘参数
+    const width = (canvas.width / window.devicePixelRatio) / 2; // 转盘半径
     const centerX = width; // 中心点X坐标
     const centerY = width; // 中心点Y坐标
     const angle = 2 * Math.PI / prizes.length; // 每个扇形的角度
@@ -121,10 +152,12 @@ function drawTurntable() {
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.rotate(startAngle + angle / 2);
-        ctx.font = '16px -apple-system, BlinkMacSystemFont, sans-serif';
+        // 根据canvas大小调整字体大小
+        const fontSize = Math.max(12, width * 0.08);
+        ctx.font = fontSize + 'px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.fillStyle = '#fff';
         ctx.textAlign = 'center';
-        ctx.fillText(prize.name, width * 0.6, 8);
+        ctx.fillText(prize.name, width * 0.6, fontSize * 0.35);
         ctx.restore();
     }
     
