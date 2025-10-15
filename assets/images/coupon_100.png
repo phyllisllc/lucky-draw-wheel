@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <rect width="40" height="40" rx="5" fill="#CD7F32"/>
+  <text x="20" y="15" font-family="Arial" font-size="12" fill="white" text-anchor="middle">优惠券</text>
+  <text x="20" y="30" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">¥100</text>
+</svg>
