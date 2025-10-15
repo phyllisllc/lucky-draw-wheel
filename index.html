@@ -464,11 +464,9 @@
         <div class="process-section">
             <h3 class="process-title">抽奖流程</h3>
             <div class="process-content">
-                <p>1. 成为德玛仕品牌会员，活动期间即可获得1次免费抽奖机会；</p>
-                <p>2. 凡是活动期间购买可获得抽奖机会1次；</p>
-                <p>3. 收藏加购活动商品，活动期间即可获得1次免费抽奖机会；</p>
-                <p>4. 点击"开始抽奖"按钮，转盘旋转并最终停在随机奖项上；</p>
-                <p>5. 中奖结果将实时显示，中奖用户需按提示进行下一步操作。</p>
+                <p>1. 成为德玛仕品牌会员或活动期间购买，即可获得3次免费抽奖机会；</p>
+                <p>2. 点击"开始抽奖"按钮，转盘旋转并最终停在随机奖项上；</p>
+                <p>3. 中奖结果将实时显示，中奖用户需按提示进行下一步操作。</p>
             </div>
         </div>
 
@@ -891,12 +889,11 @@
 
         // 从本地存储加载抽奖次数
         function loadChances() {
-            const today = new Date().toDateString();
-            const savedDate = localStorage.getItem('lotteryDate');
+            // 检查是否已经设置了抽奖次数
             const savedChances = localStorage.getItem('lotteryChances');
             
-            // 如果是同一天，加载保存的次数；否则重置次数
-            if (savedDate === today && savedChances !== null) {
+            // 如果已有保存的次数，则使用该次数；否则初始化为3次
+            if (savedChances !== null) {
                 remainingChances = parseInt(savedChances);
             } else {
                 remainingChances = maxChances;
@@ -909,8 +906,6 @@
 
         // 保存抽奖次数到本地存储
         function saveChances() {
-            const today = new Date().toDateString();
-            localStorage.setItem('lotteryDate', today);
             localStorage.setItem('lotteryChances', remainingChances.toString());
         }
 
