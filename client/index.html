@@ -110,25 +110,41 @@
     <!-- 规则弹窗 -->
     <div id="rule-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg p-5 w-full max-w-sm mx-4 shadow-2xl">
-            <h3 class="text-xl font-bold text-center text-dark mb-4">抽奖规则</h3>
-            <ul class="text-sm text-gray-600 space-y-2">
-                <li class="flex items-start">
-                    <i class="fa fa-circle text-[4px] mt-1.5 mr-2"></i>
-                    <span>每人每天有3次抽奖机会</span>
-                </li>
-                <li class="flex items-start">
-                    <i class="fa fa-circle text-[4px] mt-1.5 mr-2"></i>
-                    <span>奖品包括：一等奖、二等奖、三等奖和谢谢参与</span>
-                </li>
-                <li class="flex items-start">
-                    <i class="fa fa-circle text-[4px] mt-1.5 mr-2"></i>
-                    <span>中奖后请按提示领取奖品</span>
-                </li>
-                <li class="flex items-start">
-                    <i class="fa fa-circle text-[4px] mt-1.5 mr-2"></i>
-                    <span>活动最终解释权归主办方所有</span>
-                </li>
-            </ul>
+            <h3 class="text-xl font-bold text-center text-dark mb-4">百万大抽奖活动规则</h3>
+            <div class="max-h-96 overflow-y-auto pr-2">
+                <p class="mb-2">1. 成为德玛仕品牌会员，活动期间即可获得1次免费抽奖机会；</p>
+                <p class="mb-2">2. 凡是活动期间购买可获得抽奖机会1次；</p>
+                <p class="mb-4">3. 收藏加购活动商品，活动期间即可获得1次免费抽奖机会；</p>
+                
+                <h4 class="font-bold mb-2">奖品如下：</h4>
+                <p class="mb-2">1. 大额优惠券（与店铺优惠券不叠加）：</p>
+                <p class="mb-1 ml-4">- 800元-50元（中奖概率5%）</p>
+                <p class="mb-1 ml-4">- 1500元-100元（中奖概率5%）</p>
+                <p class="mb-1 ml-4">- 3000元-200元（中奖概率5%）</p>
+                <p class="mb-1 ml-4">- 5000元-300元（中奖概率5%）</p>
+                <p class="mb-2 ml-4">- 10000元-500元（中奖概率79%）</p>
+                <p class="mb-2">2. 价值599元德玛仕3500W电磁炉IH-QT-3500H1（中奖概率1%）</p>
+                <p class="mb-2">3. 价值1899元华为平板HUWEIMatePad（中奖概率0%）</p>
+                <p class="mb-4">4. 价值19999元华为Mate XT 非凡大师 三折叠屏手机（中奖概率0%）</p>
+                
+                <h4 class="font-bold mb-2">抽奖流程：</h4>
+                <p class="mb-4">用户完成指定任务后，抽奖机会将自动计入账户。进入活动页面即可点击抽奖，奖品随机抽取，100%有奖。</p>
+                
+                <h4 class="font-bold mb-2">中奖通知：</h4>
+                <p class="mb-4">中奖结果将实时显示。中奖实物奖品及大额优惠券的用户，需在24小时内联系客服登记，逾期视为自动放弃。</p>
+                
+                <h4 class="font-bold mb-2">奖品发放：</h4>
+                <p class="mb-2">优惠券类奖品：将自动发放至中奖用户的账户，有效期至9月17日24:00</p>
+                <p class="mb-4">实物奖品：将在活动结束后10个工作日内统一核实并寄出。</p>
+                
+                <h4 class="font-bold mb-2">资格取消条款：</h4>
+                <p class="mb-2">若用户账户存在异常、作弊或违反平台规则的行为，德玛仕有权取消其获奖资格。</p>
+                <p class="mb-2">若该笔订单在抽奖后发生全额退款或取消，则由此订单获得的抽奖机会及通过这机会抽中的所有奖品（包括优惠券和实物）将自动失效。</p>
+                <p class="mb-2">若订单为部分退款，且订单状态仍为'交易成功'，则抽奖资格及所获奖品予以保留。</p>
+                <p class="mb-2">所有优惠券奖品一经使用，若订单发生退款，该优惠券将作废不予退还。</p>
+                <p class="mb-2">*此抽奖礼品不与店铺其他优惠券、赠品等活动叠加使用。</p>
+                <p class="mb-4">*中奖客户由各自店铺进行发货即可</p>
+            </div>
             <button id="close-rule-btn" class="mt-5 w-full py-2 bg-primary text-white rounded-lg font-medium transition-colors hover:bg-primary/90">
                 我知道了
             </button>
@@ -162,18 +178,18 @@
     <script>
         // 奖品配置
         const prizes = [
-            { name: '一等奖', icon: 'fa-trophy', color: '#FFD700' },
-            { name: '二等奖', icon: 'fa-gift', color: '#C0C0C0' },
-            { name: '三等奖', icon: 'fa-medal', color: '#CD7F32' },
-            { name: '谢谢参与', icon: 'fa-meh-o', color: '#CCCCCC' },
-            { name: '谢谢参与', icon: 'fa-meh-o', color: '#CCCCCC' },
-            { name: '三等奖', icon: 'fa-medal', color: '#CD7F32' },
-            { name: '二等奖', icon: 'fa-gift', color: '#C0C0C0' },
-            { name: '谢谢参与', icon: 'fa-meh-o', color: '#CCCCCC' }
+            { name: '800元-50元优惠券', icon: 'fa-ticket', color: '#FF6B6B' },
+            { name: '1500元-100元优惠券', icon: 'fa-ticket', color: '#4ECDC4' },
+            { name: '3000元-200元优惠券', icon: 'fa-ticket', color: '#FFD166' },
+            { name: '5000元-300元优惠券', icon: 'fa-ticket', color: '#06D6A0' },
+            { name: '10000元-500元优惠券', icon: 'fa-ticket', color: '#118AB2' },
+            { name: '德玛仕3500W电磁炉', icon: 'fa-fire', color: '#073B4C' },
+            { name: '华为平板', icon: 'fa-tablet', color: '#FF6B6B' },
+            { name: '华为Mate XT手机', icon: 'fa-mobile', color: '#4ECDC4' }
         ];
         
         // 权重配置 - 控制中奖概率
-        const weights = [5, 10, 20, 65]; // 一等奖、二等奖、三等奖、谢谢参与的权重
+        const weights = [5, 5, 5, 5, 79, 1, 0, 0]; // 对应上面奖品的权重，总和为100
         
         // 全局变量
         let remainingSpins;
@@ -229,21 +245,19 @@
                 totalWeight += weights[i];
             }
             
+            // 特殊情况：如果总权重为0，随机返回一个奖品
+            if (totalWeight === 0) {
+                return Math.floor(Math.random() * prizes.length);
+            }
+            
             let random = Math.random() * totalWeight;
             let selectedIndex = 0;
             
+            // 遍历权重数组，选择对应的奖品
             for (let i = 0; i < weights.length; i++) {
                 random -= weights[i];
                 if (random <= 0) {
-                    // 找到对应的奖品类型后，随机选择该类型中的一个奖品
-                    const typePrizes = prizes.map((p, idx) => ({ ...p, index: idx }))
-                        .filter(p => {
-                            if (i === 0) return p.name === '一等奖';
-                            if (i === 1) return p.name === '二等奖';
-                            if (i === 2) return p.name === '三等奖';
-                            return p.name === '谢谢参与';
-                        });
-                    selectedIndex = typePrizes[Math.floor(Math.random() * typePrizes.length)].index;
+                    selectedIndex = i;
                     break;
                 }
             }
