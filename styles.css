@@ -264,6 +264,35 @@ body {
     cursor: pointer;
 }
 
+/* 抽奖流程说明样式 */
+.process-section {
+    width: 100%;
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.process-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff6700;
+    margin-bottom: 15px;
+}
+
+.process-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.process-content p {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.6;
+}
+
 /* 规则说明区域 */
 .rules-section {
     width: 100%;
