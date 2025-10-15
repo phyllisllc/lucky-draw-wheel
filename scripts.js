@@ -7,14 +7,14 @@ const maxChances = 3; // 最大抽奖次数
 
 // 奖项数据
 const prizes = [
-    { name: '800元-50元优惠券', value: '800元-50元优惠券', color: '#FF6B6B', probability: 5 },
-    { name: '1500元-100元优惠券', value: '1500元-100元优惠券', color: '#CD7F32', probability: 5 },
-    { name: '3000元-200元优惠券', value: '3000元-200元优惠券', color: '#C0C0C0', probability: 5 },
-    { name: '5000元-300元优惠券', value: '5000元-300元优惠券', color: '#FFD700', probability: 5 },
-    { name: '10000元-500元优惠券', value: '10000元-500元优惠券', color: '#4ECDC4', probability: 79 },
-    { name: '德玛仕3500W电磁炉', value: '德玛仕3500W电磁炉IH-QT-3500H1(价值599元)', color: '#FF9800', probability: 1 },
-    { name: '华为平板', value: '华为平板HUWEIMatePad(价值1899元)', color: '#9C27B0', probability: 0 },
-    { name: '华为Mate XT手机', value: '华为Mate XT 非凡大师 三折叠屏手机(价值19999元)', color: '#E91E63', probability: 0 }
+    { name: '八等奖：50元优惠券', value: '800元-50元优惠券', color: '#FF6B6B', probability: 5, image: 'assets/images/coupon_50.png' },
+    { name: '七等奖：100元优惠券', value: '1500元-100元优惠券', color: '#CD7F32', probability: 5, image: 'assets/images/coupon_100.png' },
+    { name: '六等奖：200元优惠券', value: '3000元-200元优惠券', color: '#C0C0C0', probability: 5, image: 'assets/images/coupon_200.png' },
+    { name: '五等奖：300元优惠券', value: '5000元-300元优惠券', color: '#FFD700', probability: 5, image: 'assets/images/coupon_300.png' },
+    { name: '四等奖：500元优惠券', value: '10000元-500元优惠券', color: '#4ECDC4', probability: 79, image: 'assets/images/coupon_500.png' },
+    { name: '三等奖：德玛仕电磁炉', value: '德玛仕3500W电磁炉IH-QT-3500H1(价值599元)', color: '#FF9800', probability: 1, image: 'assets/images/induction_cooker.png' },
+    { name: '二等奖：华为平板', value: '华为平板HUWEIMatePad(价值1899元)', color: '#9C27B0', probability: 0, image: 'assets/images/huawei_tablet.png' },
+    { name: '一等奖：华为Mate XT手机', value: '华为Mate XT 非凡大师 三折叠屏手机(价值19999元)', color: '#E91E63', probability: 0, image: 'assets/images/huawei_phone.png' }
 ];
 
 // DOM元素
@@ -124,10 +124,33 @@ function drawTurntable() {
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.rotate(startAngle + angle / 2);
-        ctx.font = '16px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.fillStyle = '#fff';
         ctx.textAlign = 'center';
         ctx.fillText(prize.name, width * 0.6, 8);
+        
+        // 绘制奖项图片（使用占位符图像，实际图片会在加载后显示）
+        if (prize.image) {
+            const img = new Image();
+            img.src = prize.image;
+            img.onload = function() {
+                // 由于图片加载是异步的，这里需要重新获取画布上下文并设置相同的变换
+                const tempCtx = document.getElementById('turntableCanvas').getContext('2d');
+                tempCtx.save();
+                tempCtx.translate(centerX, centerY);
+                tempCtx.rotate(startAngle + angle / 2);
+                
+                // 计算图片尺寸和位置
+                const imgSize = 40; // 图片大小
+                const imgX = width * 0.4; // 图片x坐标
+                const imgY = -20; // 图片y坐标
+                
+                // 绘制图片
+                tempCtx.drawImage(img, imgX, imgY, imgSize, imgSize);
+                tempCtx.restore();
+            };
+        }
+        
         ctx.restore();
     }
     
