@@ -7,12 +7,12 @@ const maxChances = 3; // 最大抽奖次数
 
 // 奖项数据
 const prizes = [
-    { name: '一等奖', value: 'iPhone 15', color: '#FFD700', probability: 1 },
-    { name: '二等奖', value: '100元红包', color: '#C0C0C0', probability: 3 },
-    { name: '三等奖', value: '20元话费', color: '#CD7F32', probability: 6 },
-    { name: '四等奖', value: '5元红包', color: '#FF6B6B', probability: 10 },
-    { name: '五等奖', value: '1元红包', color: '#4ECDC4', probability: 20 },
-    { name: '谢谢参与', value: '再接再厉', color: '#E9ECEF', probability: 60 }
+    { name: '5000元-300元优惠券', value: '5000元-300元优惠券', color: '#FFD700', probability: 5 },
+    { name: '3000元-200元优惠券', value: '3000元-200元优惠券', color: '#C0C0C0', probability: 5 },
+    { name: '1500元-100元优惠券', value: '1500元-100元优惠券', color: '#CD7F32', probability: 5 },
+    { name: '800元-50元优惠券', value: '800元-50元优惠券', color: '#FF6B6B', probability: 5 },
+    { name: '10000元-500元优惠券', value: '10000元-500元优惠券', color: '#4ECDC4', probability: 79 },
+    { name: '德玛仕3500W电磁炉', value: '德玛仕3500W电磁炉IH-QT-3500H1(价值599元)', color: '#FF9800', probability: 1 }
 ];
 
 // DOM元素
