@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>调试页面</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-blue-50 to-purple-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8">抽奖转盘调试页面</h1>
+        
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">外部资源加载测试</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <p class="font-medium">Tailwind CSS:</p>
+                    <p id="tailwind-status" class="text-red-500">未加载</p>
+                </div>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <p class="font-medium">Font Awesome:</p>
+                    <p id="fa-status" class="text-red-500">未加载</p>
+                    <i class="fa fa-gift text-2xl mt-2" id="fa-test"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">JavaScript执行环境测试</h2>
+            <div class="space-y-4">
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <p class="font-medium">DOM操作:</p>
+                    <p id="dom-status" class="text-red-500">未测试</p>
+                </div>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <p class="font-medium">CSS动画:</p>
+                    <div id="animation-test" class="w-20 h-20 bg-blue-500 rounded-full mt-2"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-4">控制台信息</h2>
+            <div id="console-output" class="bg-gray-100 p-4 rounded-lg h-64 overflow-auto font-mono text-sm"></div>
+        </div>
+    </div>
+    
+    <script>
+        // 重写console.log，以便在页面上显示
+        const consoleOutput = document.getElementById('console-output');
+        const originalConsoleLog = console.log;
+        console.log = function() {
+            const args = Array.from(arguments);
+            const logLine = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg
+            ).join(' ') + '\n';
+            
+            originalConsoleLog.apply(console, arguments);
+            consoleOutput.textContent += logLine;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        };
+        
+        // 重写console.error
+        const originalConsoleError = console.error;
+        console.error = function() {
+            const args = Array.from(arguments);
+            const logLine = '%cERROR: ' + args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg
+            ).join(' ') + '\n';
+            
+            originalConsoleError.apply(console, arguments);
+            consoleOutput.textContent += logLine.replace('%c', '');
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        };
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('页面加载完成，开始测试...');
+            
+            // 测试Tailwind CSS是否加载
+            try {
+                const testElement = document.createElement('div');
+                testElement.className = 'hidden';
+                document.body.appendChild(testElement);
+                const computedStyle = window.getComputedStyle(testElement);
+                if (computedStyle.display === 'none') {
+                    document.getElementById('tailwind-status').textContent = '已加载';
+                    document.getElementById('tailwind-status').className = 'text-green-500';
+                    console.log('✅ Tailwind CSS 加载成功');
+                } else {
+                    console.error('❌ Tailwind CSS 未正确加载');
+                }
+                document.body.removeChild(testElement);
+            } catch (e) {
+                console.error('❌ Tailwind CSS 加载失败:', e);
+            }
+            
+            // 测试Font Awesome是否加载
+            try {
+                const faTest = document.getElementById('fa-test');
+                // 检查图标是否正确显示（简单判断）
+                if (window.FontAwesome !== undefined) {
+                    document.getElementById('fa-status').textContent = '已加载';
+                    document.getElementById('fa-status').className = 'text-green-500';
+                    console.log('✅ Font Awesome 加载成功');
+                } else {
+                    console.error('❌ Font Awesome 未正确加载');
+                }
+            } catch (e) {
+                console.error('❌ Font Awesome 加载失败:', e);
+            }
+            
+            // 测试DOM操作
+            try {
+                const domTest = document.createElement('div');
+                domTest.textContent = 'DOM测试成功';
+                domTest.className = 'text-green-500';
+                document.getElementById('dom-status').parentNode.appendChild(domTest);
+                document.getElementById('dom-status').textContent = '成功';
+                document.getElementById('dom-status').className = 'text-green-500';
+                console.log('✅ DOM操作测试成功');
+            } catch (e) {
+                console.error('❌ DOM操作测试失败:', e);
+            }
+            
+            // 测试CSS动画
+            try {
+                const animTest = document.getElementById('animation-test');
+                animTest.style.transition = 'transform 1s ease-in-out';
+                
+                let rotate = 0;
+                setInterval(() => {
+                    rotate += 360;
+                    animTest.style.transform = `rotate(${rotate}deg)`;
+                }, 2000);
+                
+                console.log('✅ CSS动画测试已启动');
+            } catch (e) {
+                console.error('❌ CSS动画测试失败:', e);
+            }
+            
+            // 测试JSON解析
+            try {
+                const testJson = '{"name":"test","value":123}';
+                const parsed = JSON.parse(testJson);
+                console.log('✅ JSON解析测试成功:', parsed);
+            } catch (e) {
+                console.error('❌ JSON解析测试失败:', e);
+            }
+            
+            // 测试Math函数
+            try {
+                const random = Math.random();
+                const floor = Math.floor(random * 10);
+                console.log('✅ Math函数测试成功: random=', random, 'floor=', floor);
+            } catch (e) {
+                console.error('❌ Math函数测试失败:', e);
+            }
+            
+            // 列出所有全局变量，查看是否有冲突
+            try {
+                const globalVars = Object.keys(window).filter(key => 
+                    !key.startsWith('_') && 
+                    typeof window[key] !== 'function' &&
+                    typeof window[key] !== 'object' &&
+                    key !== 'window' && key !== 'document'
+                );
+                console.log('全局变量列表:', globalVars);
+            } catch (e) {
+                console.error('列出全局变量失败:', e);
+            }
+            
+            console.log('调试测试完成');
+        });
+    </script>
+</body>
+</html>

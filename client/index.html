@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>微信抽奖转盘</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B6B',
+                        secondary: '#4ECDC4',
+                        accent: '#FFD166',
+                        dark: '#2A2D34',
+                        light: '#F7FFF7'
+                    },
+                    fontFamily: {
+                        sans: ['Arial', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .rotate-center {
+                transform-origin: center;
+            }
+            .prize-item {
+                position: absolute;
+                width: 80px;
+                height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transform-origin: 160px 160px;
+                font-size: 14px;
+                font-weight: bold;
+                color: #333;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-light to-secondary min-h-screen flex flex-col items-center justify-center p-4">
+    <!-- 页面标题 -->
+    <div class="mb-8 text-center">
+        <h1 class="text-[clamp(1.8rem,5vw,2.5rem)] font-bold text-dark text-shadow">幸运抽奖转盘</h1>
+        <p class="text-gray-600 mt-2">祝您好运！</p>
+    </div>
+    
+    <!-- 抽奖区域 -->
+    <div class="relative w-[min(85vw,400px)] h-[min(85vw,400px)]">
+        <!-- 转盘背景 -->
+        <div id="wheel" class="absolute inset-0 rounded-full border-8 border-primary bg-white shadow-2xl transition-transform duration-[3s] ease-out">
+            <!-- 转盘指针 -->
+            <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary rounded-full shadow-lg z-10 flex items-center justify-center">
+                <div class="w-2 h-4 bg-white"></div>
+            </div>
+            
+            <!-- 奖品区域 -->
+            <div id="prize-container" class="absolute inset-0 rounded-full p-4">
+                <!-- 奖品将通过JavaScript动态生成 -->
+            </div>
+        </div>
+        
+        <!-- 中心按钮 -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[100px] h-[100px] rounded-full bg-primary shadow-xl flex items-center justify-center cursor-pointer z-20 transition-all hover:scale-105 active:scale-95">
+            <div class="w-[80px] h-[80px] rounded-full bg-white flex items-center justify-center">
+                <span id="spin-btn" class="text-primary font-bold text-xl">抽奖</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 抽奖信息和规则 -->
+    <div class="mt-8 w-full max-w-md">
+        <div class="bg-white/80 backdrop-blur-sm rounded-lg p-4 shadow-md">
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center">
+                    <i class="fa fa-ticket text-primary mr-2"></i>
+                    <span class="font-medium">剩余抽奖次数：</span>
+                    <span id="remaining-spins" class="ml-2 font-bold text-primary">3</span>
+                </div>
+                <button id="rule-btn" class="text-secondary text-sm">
+                    <i class="fa fa-info-circle mr-1"></i> 规则
+                </button>
+            </div>
+            
+            <!-- 抽奖记录 -->
+            <div class="mt-3">
+                <h3 class="text-sm font-medium text-gray-600 mb-2">最近抽奖记录</h3>
+                <div id="spin-history" class="text-xs text-gray-500 max-h-16 overflow-y-auto">
+                    <!-- 抽奖记录将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 弹窗区域 -->
+    <!-- 规则弹窗 -->
+    <div id="rule-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-5 w-full max-w-sm mx-4 shadow-2xl">
+            <h3 class="text-xl font-bold text-center text-dark mb-4">抽奖规则</h3>
+            <ul class="text-sm text-gray-600 space-y-2">
+                <li class="flex items-start">
+                    <i class="fa fa-circle text-[4px] mt-1.5 mr-2"></i>
+                    <span>每人每天有3次抽奖机会</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fa fa-circle text-[4px] mt-1.5 mr-2"></i>
+                    <span>奖品包括：一等奖、二等奖、三等奖和谢谢参与</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fa fa-circle text-[4px] mt-1.5 mr-2"></i>
+                    <span>中奖后请按提示领取奖品</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fa fa-circle text-[4px] mt-1.5 mr-2"></i>
+                    <span>活动最终解释权归主办方所有</span>
+                </li>
+            </ul>
+            <button id="close-rule-btn" class="mt-5 w-full py-2 bg-primary text-white rounded-lg font-medium transition-colors hover:bg-primary/90">
+                我知道了
+            </button>
+        </div>
+    </div>
+    
+    <!-- 结果弹窗 -->
+    <div id="result-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-5 w-full max-w-sm mx-4 shadow-2xl text-center">
+            <div class="w-24 h-24 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                <i id="result-icon" class="fa fa-gift text-4xl text-white"></i>
+            </div>
+            <h3 id="result-title" class="text-xl font-bold text-dark mb-2">恭喜中奖！</h3>
+            <p id="result-message" class="text-gray-600 mb-5">您获得了一等奖</p>
+            <div class="flex space-x-3">
+                <button id="share-btn" class="flex-1 py-2 border border-secondary text-secondary rounded-lg font-medium transition-colors hover:bg-secondary/10">
+                    <i class="fa fa-share-alt mr-1"></i> 分享
+                </button>
+                <button id="close-result-btn" class="flex-1 py-2 bg-primary text-white rounded-lg font-medium transition-colors hover:bg-primary/90">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 活动说明 -->
+    <div class="mt-8 text-center text-xs text-gray-500 max-w-md">
+        <p>本活动由主办方提供，与微信官方无关</p>
+    </div>
+    
+    <script>
+        // 奖品配置
+        const prizes = [
+            { name: '一等奖', icon: 'fa-trophy', color: '#FFD700' },
+            { name: '二等奖', icon: 'fa-gift', color: '#C0C0C0' },
+            { name: '三等奖', icon: 'fa-medal', color: '#CD7F32' },
+            { name: '谢谢参与', icon: 'fa-meh-o', color: '#CCCCCC' },
+            { name: '谢谢参与', icon: 'fa-meh-o', color: '#CCCCCC' },
+            { name: '三等奖', icon: 'fa-medal', color: '#CD7F32' },
+            { name: '二等奖', icon: 'fa-gift', color: '#C0C0C0' },
+            { name: '谢谢参与', icon: 'fa-meh-o', color: '#CCCCCC' }
+        ];
+        
+        // 权重配置 - 控制中奖概率
+        const weights = [5, 10, 20, 65]; // 一等奖、二等奖、三等奖、谢谢参与的权重
+        
+        // 全局变量
+        let remainingSpins;
+        let isSpinning;
+        let spinHistory;
+        
+        // DOM元素引用
+        let wheel, spinBtn, remainingSpinsEl, spinHistoryEl, prizeContainer;
+        let ruleModal, ruleBtn, closeRuleBtn;
+        let resultModal, resultTitle, resultMessage, resultIcon, closeResultBtn, shareBtn;
+        
+        // 初始化转盘
+        function initWheel() {
+            const segmentAngle = 360 / prizes.length;
+            
+            // 创建奖品项目
+            prizes.forEach((prize, index) => {
+                const angle = segmentAngle * index;
+                const prizeItem = document.createElement('div');
+                prizeItem.className = 'prize-item';
+                prizeItem.style.transform = `rotate(${angle}deg) translateY(-80px)`;
+                
+                // 创建奖品内容
+                const prizeContent = document.createElement('div');
+                prizeContent.className = 'transform rotate-[-90deg] text-center';
+                prizeContent.innerHTML = `
+                    <div class="flex flex-col items-center">
+                        <i class="fa ${prize.icon} text-lg mb-1"></i>
+                        <span>${prize.name}</span>
+                    </div>
+                `;
+                
+                prizeItem.appendChild(prizeContent);
+                prizeContainer.appendChild(prizeItem);
+            });
+            
+            // 添加分隔线
+            for (let i = 0; i < prizes.length; i++) {
+                const divider = document.createElement('div');
+                divider.className = 'absolute w-0.5 h-16 bg-primary/20 top-4';
+                divider.style.left = '50%';
+                divider.style.transformOrigin = 'center 176px';
+                divider.style.transform = `rotate(${i * segmentAngle}deg)`;
+                prizeContainer.appendChild(divider);
+            }
+        }
+        
+        // 根据权重随机选择奖品
+        function selectPrize() {
+            let totalWeight = 0;
+            for (let i = 0; i < weights.length; i++) {
+                totalWeight += weights[i];
+            }
+            
+            let random = Math.random() * totalWeight;
+            let selectedIndex = 0;
+            
+            for (let i = 0; i < weights.length; i++) {
+                random -= weights[i];
+                if (random <= 0) {
+                    // 找到对应的奖品类型后，随机选择该类型中的一个奖品
+                    const typePrizes = prizes.map((p, idx) => ({ ...p, index: idx }))
+                        .filter(p => {
+                            if (i === 0) return p.name === '一等奖';
+                            if (i === 1) return p.name === '二等奖';
+                            if (i === 2) return p.name === '三等奖';
+                            return p.name === '谢谢参与';
+                        });
+                    selectedIndex = typePrizes[Math.floor(Math.random() * typePrizes.length)].index;
+                    break;
+                }
+            }
+            
+            return selectedIndex;
+        }
+        
+        // 旋转转盘
+        function spinWheel() {
+            if (isSpinning || remainingSpins <= 0) return;
+            
+            isSpinning = true;
+            remainingSpins--;
+            remainingSpinsEl.textContent = remainingSpins;
+            
+            // 选择奖品
+            const selectedIndex = selectPrize();
+            const selectedPrize = prizes[selectedIndex];
+            
+            // 计算旋转角度（额外转5-8圈）
+            const baseRotation = 360 * (5 + Math.random() * 3);
+            const segmentAngle = 360 / prizes.length;
+            // 确保指针指向奖品的中心
+            const targetRotation = baseRotation + (360 - selectedIndex * segmentAngle - segmentAngle / 2);
+            
+            // 应用旋转动画
+            wheel.style.transform = `rotate(${targetRotation}deg)`;
+            
+            // 添加到历史记录
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            spinHistory.push({ time: timeStr, prize: selectedPrize.name });
+            updateHistory();
+            
+            // 动画结束后显示结果
+            setTimeout(() => {
+                showResult(selectedPrize);
+                isSpinning = false;
+            }, 3000);
+        }
+        
+        // 更新历史记录
+        function updateHistory() {
+            spinHistoryEl.innerHTML = '';
+            spinHistory.slice(-3).forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'py-1 flex justify-between';
+                historyItem.innerHTML = `
+                    <span>${item.time}</span>
+                    <span>${item.prize}</span>
+                `;
+                spinHistoryEl.appendChild(historyItem);
+            });
+        }
+        
+        // 显示结果弹窗
+        function showResult(prize) {
+            if (prize.name === '谢谢参与') {
+                resultTitle.textContent = '再接再厉';
+                resultIcon.className = 'fa fa-meh-o text-4xl text-white';
+                shareBtn.style.display = 'none';
+            } else {
+                resultTitle.textContent = '恭喜中奖！';
+                resultIcon.className = `fa ${prize.icon} text-4xl text-white`;
+                shareBtn.style.display = 'block';
+            }
+            
+            resultMessage.textContent = `您获得了${prize.name}`;
+            resultModal.classList.remove('hidden');
+        }
+        
+
+        
+        // 初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            // 初始化变量
+            remainingSpins = 3;
+            isSpinning = false;
+            spinHistory = [];
+            
+            // 获取DOM元素
+            wheel = document.getElementById('wheel');
+            spinBtn = document.getElementById('spin-btn').parentElement;
+            remainingSpinsEl = document.getElementById('remaining-spins');
+            spinHistoryEl = document.getElementById('spin-history');
+            prizeContainer = document.getElementById('prize-container');
+            
+            ruleModal = document.getElementById('rule-modal');
+            ruleBtn = document.getElementById('rule-btn');
+            closeRuleBtn = document.getElementById('close-rule-btn');
+            
+            resultModal = document.getElementById('result-modal');
+            resultTitle = document.getElementById('result-title');
+            resultMessage = document.getElementById('result-message');
+            resultIcon = document.getElementById('result-icon');
+            closeResultBtn = document.getElementById('close-result-btn');
+            shareBtn = document.getElementById('share-btn');
+            
+            // 防止页面滚动
+            document.body.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            }, { passive: false });
+            
+            // 添加事件监听
+            spinBtn.addEventListener('click', spinWheel);
+            
+            // 规则弹窗
+            ruleBtn.addEventListener('click', () => {
+                ruleModal.classList.remove('hidden');
+            });
+            
+            closeRuleBtn.addEventListener('click', () => {
+                ruleModal.classList.add('hidden');
+            });
+            
+            // 结果弹窗
+            closeResultBtn.addEventListener('click', () => {
+                resultModal.classList.add('hidden');
+            });
+            
+            shareBtn.addEventListener('click', () => {
+                // 模拟分享功能
+                alert('分享功能已触发，在微信环境中会调用原生分享');
+                resultModal.classList.add('hidden');
+            });
+            
+            // 点击弹窗外部关闭
+            ruleModal.addEventListener('click', (e) => {
+                if (e.target === ruleModal) {
+                    ruleModal.classList.add('hidden');
+                }
+            });
+            
+            resultModal.addEventListener('click', (e) => {
+                if (e.target === resultModal) {
+                    resultModal.classList.add('hidden');
+                }
+            });
+            
+            // 初始化转盘
+            initWheel();
+            remainingSpinsEl.textContent = remainingSpins;
+            
+            // 微信环境检测
+            const isWechat = /micromessenger/i.test(navigator.userAgent);
+            if (isWechat) {
+                console.log('当前在微信环境中');
+                // 这里可以添加微信JS-SDK的初始化代码
+            }
+        });
+    </script>
+</body>
+</html>
