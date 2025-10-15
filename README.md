@@ -35,7 +35,7 @@
 
 ### 奖项配置
 
-在`index.html`文件中的JavaScript部分，您可以自定义奖项内容和中奖概率：
+在`zhuanpan.html`文件中的JavaScript部分，您可以自定义奖项内容和中奖概率：
 
 ```javascript
 // 奖品配置
@@ -56,7 +56,7 @@ const weights = [5, 10, 20, 65]; // 一等奖、二等奖、三等奖、谢谢�
 
 ### 微信JS-SDK配置
 
-如需使用微信分享等功能，您需要在页面中配置微信JS-SDK。在`index.html`文件底部已有相关提示位置：
+如需使用微信分享等功能，您需要在页面中配置微信JS-SDK。在`zhuanpan.html`文件底部已有相关提示位置：
 
 ```javascript
 // 微信环境检测

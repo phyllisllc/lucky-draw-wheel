@@ -7,12 +7,14 @@ const maxChances = 3; // 最大抽奖次数
 
 // 奖项数据
 const prizes = [
-    { name: '5000元-300元优惠券', value: '5000元-300元优惠券', color: '#FFD700', probability: 5 },
-    { name: '3000元-200元优惠券', value: '3000元-200元优惠券', color: '#C0C0C0', probability: 5 },
-    { name: '1500元-100元优惠券', value: '1500元-100元优惠券', color: '#CD7F32', probability: 5 },
     { name: '800元-50元优惠券', value: '800元-50元优惠券', color: '#FF6B6B', probability: 5 },
+    { name: '1500元-100元优惠券', value: '1500元-100元优惠券', color: '#CD7F32', probability: 5 },
+    { name: '3000元-200元优惠券', value: '3000元-200元优惠券', color: '#C0C0C0', probability: 5 },
+    { name: '5000元-300元优惠券', value: '5000元-300元优惠券', color: '#FFD700', probability: 5 },
     { name: '10000元-500元优惠券', value: '10000元-500元优惠券', color: '#4ECDC4', probability: 79 },
-    { name: '德玛仕3500W电磁炉', value: '德玛仕3500W电磁炉IH-QT-3500H1(价值599元)', color: '#FF9800', probability: 1 }
+    { name: '德玛仕3500W电磁炉', value: '德玛仕3500W电磁炉IH-QT-3500H1(价值599元)', color: '#FF9800', probability: 1 },
+    { name: '华为平板', value: '华为平板HUWEIMatePad(价值1899元)', color: '#9C27B0', probability: 0 },
+    { name: '华为Mate XT手机', value: '华为Mate XT 非凡大师 三折叠屏手机(价值19999元)', color: '#E91E63', probability: 0 }
 ];
 
 // DOM元素
